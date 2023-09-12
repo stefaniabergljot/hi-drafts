@@ -4,7 +4,7 @@ from scipy.stats import poisson
 import math
 
 noLocations = 3
-noBikes = 50
+noBikes = 15
 
 #state = {}
 flowProbabilities = {}
@@ -104,8 +104,8 @@ def getValue(state):
     #return values[str(state)]
 
 state = setupRandomBikes()
-#setupEvenProbabilities()
-setupUnevenProbabilities()
+setupEvenProbabilities()
+#setupUnevenProbabilities()
 heat = 0.1
 discount = 0.7
 for i in range(3000):
@@ -113,34 +113,29 @@ for i in range(3000):
     state = setupRandomBikes()
     for i in range(100):
         state, locationTuples = randomStep(state, locationTuples, allLocationTuples)
-#for i in range(100):
-#    state = {0:15, 1:0, 2:0}
-#    for i in range(100):
-#        state, locationTuples = randomStep(state, locationTuples, allLocationTuples)
-#for i in range(100):
-#    state = {0:0, 1:15, 2:0}
-#    for i in range(100):
-#        state, locationTuples = randomStep(state, locationTuples, allLocationTuples)
-#for i in range(100):
-#    state = {0:0, 1:0, 2:15}
-#    for i in range(100):
-#        state, locationTuples = randomStep(state, locationTuples, allLocationTuples)
 
 
 print(len(values))
-reverseValues = {}
-for i in values:
-    reverseValues[values[i]] = i
+#for i in values:
+#    reverseValues[values[i]] = i
     #print(i + " :" + str(values[i]) + " \t(" + str(visited[i]) + ")")
-keys = list(reverseValues.keys())
-keys.sort(reverse=True)
-indexedByValue = {}
-for i in keys:
-    print(str(reverseValues[i]) + " : " + str(i) + "\t (" + str(visited[reverseValues[i]]) + ")\t or \t" + str(totalValue[str(reverseValues[i])]/visited[str(reverseValues[i])]))
-    indexedByValue[totalValue[str(reverseValues[i])]/visited[str(reverseValues[i])]] = str(reverseValues[i])
+#keys = list(reverseValues.keys())
+#keys.sort(reverse=True)
+# #for i in keys:
+#    print(str(reverseValues[i]) + " : " + str(i) + "\t (" + str(visited[reverseValues[i]]) + ")\t or \t" + str(totalValue[str(reverseValues[i])]/visited[str(reverseValues[i])]))
+#    indexedByValue[totalValue[str(reverseValues[i])]/visited[str(reverseValues[i])]] = str(reverseValues[i])
 # alternatively
+reverseValues = {}
+indexedByValue = {}
+
 print("-----------------------------------------")
-valueKeys = list(indexedByValue.keys())
-valueKeys.sort(reverse=True)
-for i in valueKeys:
-    print(str(i) + " " + str(indexedByValue[i]))
+outcomes = []
+for state in totalValue:
+    outcomes.append(str(getValue(state)) + " : " + str(state))
+outcomes.sort(reverse=True)
+for i in outcomes:
+    print(i)
+#valueKeys = list(indexedByValue.keys())
+#valueKeys.sort(reverse=True)
+#for i in valueKeys:
+#    print(str(i) + " " + str(indexedByValue[i]))
