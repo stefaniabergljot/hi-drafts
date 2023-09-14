@@ -3,12 +3,10 @@ import numpy as np
 from scipy.stats import poisson
 import math
 
-noLocations = 3
-noBikes = 15
+noLocations = 4
+noBikes = 20
 
-#state = {}
 flowProbabilities = {}
-values = {}
 visited = {}
 
 def setupRandomBikes():
@@ -25,13 +23,6 @@ def setupRandomBikes():
     if rem > 0:
         state[order[len(order) - 1]] += rem
     return state
-    #state = {}
-    #for location in range(noLocations):
-    #    state[location] = 0
-    #for i in range(noBikes):
-    #    location = random.randint(0, noLocations - 1)
-    #    state[location] += 1
-    #return state
 
 def setupRandomProbabilities():
     for i in range(noLocations):
@@ -56,17 +47,22 @@ def randomStep(currentState, locationTuples, allLocationTuples):
     tup, locationTuples = nextLocationWithKarma(locationTuples, allLocationTuples)
     startLocation = tup[0]
     endLocation = tup[1]
-    #print(tup)
     #startLocation, endLocation = nextLocationWithKarma(locationTuples, allLocationTuples)
     flow = poisson.rvs(flowProbabilities[startLocation, endLocation])
     actualFlow = min(flow, currentState[startLocation])
     newState[startLocation] = currentState[startLocation] - actualFlow
     newState[endLocation] = currentState[endLocation] + actualFlow
-    if newState[0]+newState[1]+newState[2] != noBikes:
-        print("Bad state!")
+    checkIfBadState(newState)
     updateValue(currentState, newState, actualFlow)
     state = newState
     return state, locationTuples
+
+def checkIfBadState(newState):
+    sum = 0
+    for i in range(noLocations):
+        sum += newState[i]
+    if sum != noBikes:
+        print("Bad state!")
 
 locationTuples = []
 allLocationTuples = []
@@ -80,15 +76,11 @@ def nextLocationWithKarma(locationTuples, allLocationTuples):
         locationTuples = allLocationTuples.copy()
     elif len(locationTuples) == 1:
         return locationTuples.pop(0), locationTuples
-    #print(len(locationTuples))
     return locationTuples.pop(random.randint(0, len(locationTuples) - 1)), locationTuples
 
 totalValue = {}
 def updateValue(state, newState, value):
-    prev = getValue(state)
     prevNewStateValue = getValue(newState)
-    newValue = prev * (1-heat) + (value + discount * prevNewStateValue) * heat
-    values[str(state)] = newValue
     if str(state) not in visited:
         visited[str(state)] = 0
         totalValue[str(state)] = 0
@@ -99,9 +91,6 @@ def getValue(state):
     if str(state) not in visited:
         return 0
     return totalValue[str(state)]/visited[str(state)]
-    #if str(state) not in values:
-    #    values[str(state)] = 0
-    #return values[str(state)]
 
 state = setupRandomBikes()
 setupEvenProbabilities()
@@ -114,28 +103,10 @@ for i in range(3000):
     for i in range(100):
         state, locationTuples = randomStep(state, locationTuples, allLocationTuples)
 
-
-print(len(values))
-#for i in values:
-#    reverseValues[values[i]] = i
-    #print(i + " :" + str(values[i]) + " \t(" + str(visited[i]) + ")")
-#keys = list(reverseValues.keys())
-#keys.sort(reverse=True)
-# #for i in keys:
-#    print(str(reverseValues[i]) + " : " + str(i) + "\t (" + str(visited[reverseValues[i]]) + ")\t or \t" + str(totalValue[str(reverseValues[i])]/visited[str(reverseValues[i])]))
-#    indexedByValue[totalValue[str(reverseValues[i])]/visited[str(reverseValues[i])]] = str(reverseValues[i])
-# alternatively
-reverseValues = {}
-indexedByValue = {}
-
 print("-----------------------------------------")
 outcomes = []
 for state in totalValue:
-    outcomes.append(str(getValue(state)) + " : " + str(state))
+    outcomes.append(str(getValue(state)) + " : " + str(state) + " (visited " + str(visited[str(state)])+ " times)")
 outcomes.sort(reverse=True)
 for i in outcomes:
     print(i)
-#valueKeys = list(indexedByValue.keys())
-#valueKeys.sort(reverse=True)
-#for i in valueKeys:
-#    print(str(i) + " " + str(indexedByValue[i]))
